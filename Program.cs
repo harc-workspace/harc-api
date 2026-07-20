@@ -46,6 +46,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformation>();
 builder.Services.AddScoped<IDocumentManager, DocumentManager>();
 
+builder.Services.AddHttpContextAccessor();
+
 // 3. FASTENDPOINTS SERVISI (Carter ve MediatR yerine tek güç)
 builder.Services.AddFastEndpoints();
 

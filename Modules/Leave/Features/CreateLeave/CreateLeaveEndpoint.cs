@@ -21,6 +21,7 @@ public class CreateLeave : Endpoint<CreateLeaveRequest, CreateLeaveResponse>
     {
         Post("api/leave");
         Description(b => b.WithName("CreateLeave").WithTags("Leave"));
+        AllowFileUploads();
     }
 
     public override async Task<CreateLeaveResponse> HandleAsync(CreateLeaveRequest request, CancellationToken ct)
@@ -34,7 +35,7 @@ public class CreateLeave : Endpoint<CreateLeaveRequest, CreateLeaveResponse>
         // Validate leave duration (should not exceed the maximum allowed for the leave type)
         
         // 1. Kullanıcı ID'sini Token'dan (Claims) al (Güvenlik için frontend'e güvenmiyoruz)
-        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        var userIdClaim = User.FindFirst("harc_user_id");
         if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
         {
             await Send.UnauthorizedAsync(ct); // 401 Döner
@@ -49,8 +50,8 @@ public class CreateLeave : Endpoint<CreateLeaveRequest, CreateLeaveResponse>
         var newLeave = new Data.LeaveEntity
         {
             UserId = userId,
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
+            StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc),
+            EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Utc),
             Days = (request.EndDate - request.StartDate).TotalDays + 1, // +1 to include the start date
             Type = request.LeaveType,
             Status = LeaveStatus.Pending,
