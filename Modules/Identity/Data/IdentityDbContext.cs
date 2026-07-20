@@ -1,11 +1,60 @@
+using Harc.Api.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harc.Api.Modules.Identity.Data;
 
 public class IdentityDbContext : DbContext
 {
-    public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyAuditInfo();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        ApplyAuditInfo();
+        return base.SaveChanges();
+    }
+
+    private void ApplyAuditInfo()
+    {
+        var user = _httpContextAccessor.HttpContext?.User?.FindFirst("name")?.Value ?? _httpContextAccessor.HttpContext?.User?.FindFirst("email")?.Value;
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAt = now;
+                entry.Entity.CreatedBy = user;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.UpdatedAt = now;
+                entry.Entity.UpdatedBy = user;
+                
+                entry.Property(x => x.CreatedAt).IsModified = false;
+                entry.Property(x => x.CreatedBy).IsModified = false;
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                entry.Entity.DeletedAt = now;
+                entry.Entity.UpdatedBy = user;
+                
+                entry.Property(x => x.CreatedAt).IsModified = false;
+                entry.Property(x => x.CreatedBy).IsModified = false;
+                entry.Property(x => x.UpdatedAt).IsModified = false;
+
+                entry.State = EntityState.Modified; // Soft delete
+            }
+        }
     }
 
     public DbSet<UserEntity> Users => Set<UserEntity>();
