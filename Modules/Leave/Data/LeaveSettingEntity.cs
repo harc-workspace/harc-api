@@ -3,7 +3,7 @@ using Harc.Api.Common.Models;
 
 namespace Harc.Api.Modules.Leave.Data;
 
-public class LeaveSetting : BaseEntity
+public class LeaveSettingEntity : BaseEntity
 {
     [Key]
     public int Id { get; set; }

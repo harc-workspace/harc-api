@@ -11,7 +11,7 @@ public enum UserStatus
     Contractor = 4
 }
 
-public class User : BaseEntity
+public class UserEntity : BaseEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
@@ -22,21 +22,21 @@ public class User : BaseEntity
     public string FullName { get; set; } = string.Empty;
     
     public int RoleId { get; set; }
-    public Role Role { get; set; } = null!;
+    public RoleEntity Role { get; set; } = null!;
     
     public int TitleId { get; set; }
-    public Title Title { get; set; } = null!;
+    public TitleEntity Title { get; set; } = null!;
     
     public int? TeamId { get; set; }
-    public Team? Team { get; set; }
+    public TeamEntity? Team { get; set; }
     
     public Guid? ManagerId { get; set; }
-    public User? Manager { get; set; }
+    public UserEntity? Manager { get; set; }
 
     public DateTime EmploymentStartDate { get; set; }
     public DateTime? EmploymentEndDate { get; set; }
     public int PriorExperienceMonths { get; set; }
-    public ICollection<Leave.Data.Leave> Leaves { get; set; } = new List<Leave.Data.Leave>();
+    public ICollection<Leave.Data.LeaveEntity> Leaves { get; set; } = new List<Leave.Data.LeaveEntity>();
 
     public string? AvatarUrl { get; set; }
     public UserStatus Status { get; set; } = UserStatus.Active;

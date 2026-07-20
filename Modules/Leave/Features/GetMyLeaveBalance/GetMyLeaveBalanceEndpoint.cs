@@ -43,7 +43,7 @@ public class GetMyLeaveBalanceEndpoint : EndpointWithoutRequest<GetMyLeaveBalanc
         // 1. Veritabanından İzin Ayarlarını Çek
         // Eğer tabloda hiç kayıt yoksa patlamaması için kod içinde fallback (varsayılan) atıyoruz.
         var settings = await _dbContext.LeaveSettings.FirstOrDefaultAsync(ct)
-                       ?? new LeaveSetting
+                       ?? new LeaveSettingEntity
                        {
                            ExperienceThresholdYears = 15,
                            AllowanceBelowThreshold = 20,

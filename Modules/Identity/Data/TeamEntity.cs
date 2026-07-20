@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Harc.Api.Common.Models;
 namespace Harc.Api.Modules.Identity.Data;
 
-public class Team : BaseEntity
+public class TeamEntity : BaseEntity
 {
     public int Id { get; set; }
 
