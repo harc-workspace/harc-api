@@ -4,6 +4,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Harc.Api.Modules.Identity.Data;
 using Microsoft.IdentityModel.Tokens;
+using Harc.Api.Modules.Document.Services;
 using Microsoft.AspNetCore.Authentication;
 using Harc.Api.Modules.Identity.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +44,7 @@ builder.Services.AddAuthorization();
 
 // 3. Şemadaki 4. Adım: Claims Transformation Servisimizi Kaydediyoruz
 builder.Services.AddScoped<IClaimsTransformation, ClaimsTransformation>();
+builder.Services.AddScoped<IDocumentManager, DocumentManager>();
 
 // 3. FASTENDPOINTS SERVISI (Carter ve MediatR yerine tek güç)
 builder.Services.AddFastEndpoints();
@@ -73,5 +75,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
     dbContext.Database.Migrate();
 }
+
+app.UseStaticFiles();
 
 app.Run();

@@ -8,12 +8,13 @@ public class IdentityDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users => Set<User>();
-    public DbSet<Role> Roles => Set<Role>();
-    public DbSet<Team> Teams => Set<Team>();
-    public DbSet<Title> Titles => Set<Title>();
-    public DbSet<Leave.Data.Leave> Leaves => Set<Leave.Data.Leave>();
-    public DbSet<Leave.Data.LeaveSetting> LeaveSettings => Set<Leave.Data.LeaveSetting>();
+    public DbSet<UserEntity> Users => Set<UserEntity>();
+    public DbSet<RoleEntity> Roles => Set<RoleEntity>();
+    public DbSet<TeamEntity> Teams => Set<TeamEntity>();
+    public DbSet<TitleEntity> Titles => Set<TitleEntity>();
+    public DbSet<Leave.Data.LeaveEntity> Leaves => Set<Leave.Data.LeaveEntity>();
+    public DbSet<Leave.Data.LeaveSettingEntity> LeaveSettings => Set<Leave.Data.LeaveSettingEntity>();
+    public DbSet<Document.Data.DocumentEntity> Documents => Set<Document.Data.DocumentEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,28 +22,28 @@ public class IdentityDbContext : DbContext
 
         modelBuilder.HasDefaultSchema("identity");
 
-        modelBuilder.Entity<Role>(entity =>
+        modelBuilder.Entity<RoleEntity>(entity =>
         {
             entity.Property(r => r.Id).ValueGeneratedOnAdd();
             entity.HasIndex(r => r.Name).IsUnique();
             entity.Property(r => r.DisplayName).HasColumnType("jsonb").IsRequired();
         });
 
-        modelBuilder.Entity<Team>(entity =>
+        modelBuilder.Entity<TeamEntity>(entity =>
         {
             entity.Property(t => t.Id).ValueGeneratedOnAdd();
             entity.HasIndex(t => t.Name).IsUnique();
             entity.Property(t => t.DisplayName).HasColumnType("jsonb").IsRequired();
         });
 
-        modelBuilder.Entity<Title>(entity =>
+        modelBuilder.Entity<TitleEntity>(entity =>
         {
             entity.Property(t => t.Id).ValueGeneratedOnAdd();
             entity.HasIndex(t => t.Name).IsUnique();
             entity.Property(t => t.DisplayName).HasColumnType("jsonb").IsRequired();
         });
 
-        modelBuilder.Entity<User>(entity =>
+        modelBuilder.Entity<UserEntity>(entity =>
         {
             entity.HasIndex(u => u.Email).IsUnique();
 
@@ -68,7 +69,10 @@ public class IdentityDbContext : DbContext
         });
 
         //Leave entity configuration
-        modelBuilder.Entity<Leave.Data.Leave>().ToTable("Leaves", "leave");
-        modelBuilder.Entity<Leave.Data.LeaveSetting>().ToTable("LeaveSettings", "leave");
+        modelBuilder.Entity<Leave.Data.LeaveEntity>().ToTable("Leaves", "leave");
+        modelBuilder.Entity<Leave.Data.LeaveSettingEntity>().ToTable("LeaveSettings", "leave");
+
+        //Document entity configuration
+        modelBuilder.Entity<Document.Data.DocumentEntity>().ToTable("Documents", "document");
     }
 }

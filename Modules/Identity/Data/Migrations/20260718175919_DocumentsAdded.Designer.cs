@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Harc.Api.Modules.Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace harc_api.Modules.Identity.Data.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    partial class IdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260718175919_DocumentsAdded")]
+    partial class DocumentsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,7 +27,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Harc.Api.Modules.Document.Data.DocumentEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Document.Data.Document", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,7 +63,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("LeaveEntityId")
+                    b.Property<int?>("LeaveId")
                         .HasColumnType("integer");
 
                     b.Property<string>("RelatedEntityId")
@@ -78,12 +81,12 @@ namespace harc_api.Modules.Identity.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LeaveEntityId");
+                    b.HasIndex("LeaveId");
 
                     b.ToTable("Documents", "document");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.RoleEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,7 +127,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Roles", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.TeamEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Team", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -165,7 +168,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Teams", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.TitleEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Title", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -206,7 +209,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Titles", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.UserEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -280,7 +283,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Users", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.Leave", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -331,7 +334,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Leaves", "leave");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveSettingEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveSetting", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -368,32 +371,32 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("LeaveSettings", "leave");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Document.Data.DocumentEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Document.Data.Document", b =>
                 {
-                    b.HasOne("Harc.Api.Modules.Leave.Data.LeaveEntity", null)
+                    b.HasOne("Harc.Api.Modules.Leave.Data.Leave", null)
                         .WithMany("Documents")
-                        .HasForeignKey("LeaveEntityId");
+                        .HasForeignKey("LeaveId");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.UserEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.User", b =>
                 {
-                    b.HasOne("Harc.Api.Modules.Identity.Data.UserEntity", "Manager")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.User", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Harc.Api.Modules.Identity.Data.RoleEntity", "Role")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harc.Api.Modules.Identity.Data.TeamEntity", "Team")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.Team", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Harc.Api.Modules.Identity.Data.TitleEntity", "Title")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.Title", "Title")
                         .WithMany("Users")
                         .HasForeignKey("TitleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -408,9 +411,9 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.Navigation("Title");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.Leave", b =>
                 {
-                    b.HasOne("Harc.Api.Modules.Identity.Data.UserEntity", "User")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.User", "User")
                         .WithMany("Leaves")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -419,22 +422,22 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.RoleEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.TitleEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Title", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.UserEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.User", b =>
                 {
                     b.Navigation("Leaves");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveEntity", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.Leave", b =>
                 {
                     b.Navigation("Documents");
                 });
