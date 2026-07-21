@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace harc_api.Modules.Identity.Data.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20260616131426_Userfix")]
-    partial class Userfix
+    [Migration("20260721085955_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,7 +27,102 @@ namespace harc_api.Modules.Identity.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Role", b =>
+            modelBuilder.Entity("Harc.Api.Common.Data.HolidayEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Holidays", "common");
+                });
+
+            modelBuilder.Entity("Harc.Api.Modules.Document.Data.DocumentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("LeaveEntityId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RelatedEntityId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeaveEntityId");
+
+                    b.ToTable("Documents", "document");
+                });
+
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.RoleEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,7 +163,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Roles", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Team", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.TeamEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -109,7 +204,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Teams", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Title", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.TitleEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -150,7 +245,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Titles", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.User", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -224,7 +319,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Users", "identity");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.Leave", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -275,7 +370,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("Leaves", "leave");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveSetting", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveSettingEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -312,25 +407,32 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.ToTable("LeaveSettings", "leave");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.User", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Document.Data.DocumentEntity", b =>
                 {
-                    b.HasOne("Harc.Api.Modules.Identity.Data.User", "Manager")
+                    b.HasOne("Harc.Api.Modules.Leave.Data.LeaveEntity", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("LeaveEntityId");
+                });
+
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.UserEntity", b =>
+                {
+                    b.HasOne("Harc.Api.Modules.Identity.Data.UserEntity", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Harc.Api.Modules.Identity.Data.Role", "Role")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.RoleEntity", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harc.Api.Modules.Identity.Data.Team", "Team")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.TeamEntity", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Harc.Api.Modules.Identity.Data.Title", "Title")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.TitleEntity", "Title")
                         .WithMany("Users")
                         .HasForeignKey("TitleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -345,9 +447,9 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.Navigation("Title");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.Leave", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveEntity", b =>
                 {
-                    b.HasOne("Harc.Api.Modules.Identity.Data.User", "User")
+                    b.HasOne("Harc.Api.Modules.Identity.Data.UserEntity", "User")
                         .WithMany("Leaves")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -356,19 +458,24 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Role", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.RoleEntity", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.Title", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.TitleEntity", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.User", b =>
+            modelBuilder.Entity("Harc.Api.Modules.Identity.Data.UserEntity", b =>
                 {
                     b.Navigation("Leaves");
+                });
+
+            modelBuilder.Entity("Harc.Api.Modules.Leave.Data.LeaveEntity", b =>
+                {
+                    b.Navigation("Documents");
                 });
 #pragma warning restore 612, 618
         }

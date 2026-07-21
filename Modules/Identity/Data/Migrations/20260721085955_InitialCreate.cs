@@ -8,16 +8,42 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace harc_api.Modules.Identity.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialIdentity : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
+                name: "document");
+
+            migrationBuilder.EnsureSchema(
+                name: "common");
+
+            migrationBuilder.EnsureSchema(
                 name: "leave");
 
             migrationBuilder.EnsureSchema(
                 name: "identity");
+
+            migrationBuilder.CreateTable(
+                name: "Holidays",
+                schema: "common",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Holidays", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "LeaveSettings",
@@ -113,7 +139,7 @@ namespace harc_api.Modules.Identity.Data.Migrations
                     TeamId = table.Column<int>(type: "integer", nullable: true),
                     ManagerId = table.Column<Guid>(type: "uuid", nullable: true),
                     EmploymentStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EmploymentEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EmploymentEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     PriorExperienceMonths = table.Column<int>(type: "integer", nullable: false),
                     AvatarUrl = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
@@ -188,6 +214,44 @@ namespace harc_api.Modules.Identity.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Documents",
+                schema: "document",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    ContentType = table.Column<string>(type: "text", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DocumentType = table.Column<string>(type: "text", nullable: false),
+                    RelatedEntityId = table.Column<string>(type: "text", nullable: false),
+                    LeaveEntityId = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "text", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_Leaves_LeaveEntityId",
+                        column: x => x.LeaveEntityId,
+                        principalSchema: "leave",
+                        principalTable: "Leaves",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_LeaveEntityId",
+                schema: "document",
+                table: "Documents",
+                column: "LeaveEntityId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Leaves_UserId",
                 schema: "leave",
@@ -251,11 +315,19 @@ namespace harc_api.Modules.Identity.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Leaves",
-                schema: "leave");
+                name: "Documents",
+                schema: "document");
+
+            migrationBuilder.DropTable(
+                name: "Holidays",
+                schema: "common");
 
             migrationBuilder.DropTable(
                 name: "LeaveSettings",
+                schema: "leave");
+
+            migrationBuilder.DropTable(
+                name: "Leaves",
                 schema: "leave");
 
             migrationBuilder.DropTable(
