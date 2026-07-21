@@ -63,6 +63,7 @@ public class IdentityDbContext : DbContext
     public DbSet<TitleEntity> Titles => Set<TitleEntity>();
     public DbSet<Leave.Data.LeaveEntity> Leaves => Set<Leave.Data.LeaveEntity>();
     public DbSet<Leave.Data.LeaveSettingEntity> LeaveSettings => Set<Leave.Data.LeaveSettingEntity>();
+    public DbSet<Common.Data.HolidayEntity> Holidays => Set<Common.Data.HolidayEntity>();
     public DbSet<Document.Data.DocumentEntity> Documents => Set<Document.Data.DocumentEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -123,5 +124,8 @@ public class IdentityDbContext : DbContext
 
         //Document entity configuration
         modelBuilder.Entity<Document.Data.DocumentEntity>().ToTable("Documents", "document");
+
+        //Holiday entity configuration
+        modelBuilder.Entity<Common.Data.HolidayEntity>().ToTable("Holidays", "common");
     }
 }
